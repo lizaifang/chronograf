@@ -312,7 +312,6 @@ class TimeMachine extends PureComponent<Props, State> {
       fluxLinks,
       onUpdateScriptStatus,
       notify,
-      timeRange,
     } = this.props
 
     return (
@@ -321,8 +320,6 @@ class TimeMachine extends PureComponent<Props, State> {
         source={this.source}
         script={script}
         onChangeScript={onChangeScript}
-        timeRange={timeRange}
-        queries={this.queriesForVis}
         links={fluxLinks}
         onUpdateStatus={onUpdateScriptStatus}
       />

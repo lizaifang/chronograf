@@ -25,7 +25,6 @@ interface Props {
   status: Status
   onChangeScript: OnChangeScript
   suggestions: Suggestion[]
-  setWasFuncSelectorClicked: (val: boolean) => void
 }
 
 interface Widget extends LineWidget {
@@ -94,20 +93,10 @@ class TimeMachineEditor extends PureComponent<Props, State> {
           onBeforeChange={this.updateCode}
           onTouchStart={this.onTouchStart}
           editorDidMount={this.handleMount}
-          onBlur={this.handleBlur}
           onKeyUp={this.handleKeyUp}
-          onFocus={this.handleFocus}
         />
       </div>
     )
-  }
-
-  private handleFocus = (): void => {
-    this.props.setWasFuncSelectorClicked(false)
-  }
-
-  private handleBlur = (): void => {
-    this.props.setWasFuncSelectorClicked(true)
   }
 
   private makeError(): void {
