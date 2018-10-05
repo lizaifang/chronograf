@@ -1,5 +1,6 @@
 // Libraries
 import React, {PureComponent} from 'react'
+import {Subscribe} from 'unstated'
 
 // Components
 import SchemaExplorer from 'src/flux/components/SchemaExplorer'
@@ -24,6 +25,7 @@ import {getSuggestions, getAST} from 'src/flux/apis'
 import {builder} from 'src/flux/constants'
 import Restarter from 'src/shared/utils/Restarter'
 import DefaultDebouncer, {Debouncer} from 'src/shared/utils/debouncer'
+import {TimeMachineContainer} from 'src/shared/utils/TimeMachineContainer'
 import {
   addNode,
   parseError,
@@ -58,7 +60,12 @@ interface Body extends FlatBody {
   id: string
 }
 
-interface Props {
+interface ConnectedProps {
+  fluxProportions: number[]
+  onSetFluxProportions: (fluxProportions: number[]) => void
+}
+
+interface PassedProps {
   script: string
   onChangeScript: (script: string) => void
   source: Source
@@ -68,6 +75,8 @@ interface Props {
   queries: Query[]
   timeRange: TimeRange
 }
+
+type Props = ConnectedProps & PassedProps
 
 interface State {
   suggestions: Suggestion[]
@@ -105,7 +114,14 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {notify, source, queries, timeRange} = this.props
+    const {
+      notify,
+      source,
+      queries,
+      timeRange,
+      fluxProportions,
+      onSetFluxProportions,
+    } = this.props
     const {
       body,
       bodyStatus,
@@ -120,9 +136,12 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       ? ComponentStatus.Default
       : ComponentStatus.Disabled
 
+    const [leftSize, middleSize, rightSize] = fluxProportions
+
     const divisions = [
       {
         name: 'Script',
+        size: leftSize,
         headerOrientation: HANDLE_VERTICAL,
         headerButtons: [
           <Button
@@ -148,6 +167,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       },
       {
         name: 'Build',
+        size: middleSize,
         headerButtons: [<Spinner key={0} status={bodyStatus} />],
         menuOptions: [],
         render: () => (
@@ -173,6 +193,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
       },
       {
         name: 'Explore',
+        size: rightSize,
         headerButtons: [],
         menuOptions: [],
         render: () => <SchemaExplorer source={source} notify={notify} />,
@@ -185,6 +206,7 @@ class FluxQueryMaker extends PureComponent<Props, State> {
         orientation={HANDLE_VERTICAL}
         divisions={divisions}
         containerClass="page-contents"
+        onResize={onSetFluxProportions}
       />
     )
   }
@@ -326,4 +348,16 @@ class FluxQueryMaker extends PureComponent<Props, State> {
   }
 }
 
-export default FluxQueryMaker
+const ConnectedFluxQueryMaker = (props: PassedProps) => (
+  <Subscribe to={[TimeMachineContainer]}>
+    {(container: TimeMachineContainer) => (
+      <FluxQueryMaker
+        {...props}
+        fluxProportions={container.state.fluxProportions}
+        onSetFluxProportions={container.handleSetFluxProportions}
+      />
+    )}
+  </Subscribe>
+)
+
+export default ConnectedFluxQueryMaker
