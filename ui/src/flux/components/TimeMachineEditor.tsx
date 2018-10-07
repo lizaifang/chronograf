@@ -95,6 +95,13 @@ class TimeMachineEditor extends PureComponent<Props, State> {
           editorDidMount={this.handleMount}
           onKeyUp={this.handleKeyUp}
         />
+        {script.trim() === '' && (
+          <div className="time-machine-editor--bg-hint">
+            <p>
+              New to Flux? Give the <strong>Script Wizard</strong> a try
+            </p>
+          </div>
+        )}
       </div>
     )
   }
